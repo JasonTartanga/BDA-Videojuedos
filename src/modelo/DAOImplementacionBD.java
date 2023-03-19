@@ -23,11 +23,15 @@ public class DAOImplementacionBD implements DAO {
 	final private String MODIFICAR_JUEGO = "UPDATE juegos SET nombre = ?, jugabilidad = ?, diseño = ?, rejugabilidad = ?, mundo = ?, graficos = ?, historia = ?, banda_sonora = ?, media = ? WHERE nombre = ?";
 
 	// DELETES
+	final private String ELIMINAR_JUEGO = "DELETE FROM juegos WHERE id = ?";
 
 	// SELECTS
 	final private String LISTAR_JUEGOS = "SELECT * FROM juegos";
 	final private String BUSCAR_JUEGOS = "SELECT * FROM juegos WHERE nombre like ? ";
 	final private String MOSTRAR_JUEGO = "SELECT * FROM juegos WHERE nombre = ?";
+
+	final private String ORDENAR_JUEGOS = "SELECT * FROM juegos ORDER BY ? ?";
+	final private String ORDENAR_JUEGOS_CONDICION = "SELECT * FROM juegos WHERE ? ? ? ORDER BY ? ?";
 
 	public void abrirConexion() {
 		try {
@@ -64,7 +68,6 @@ public class DAOImplementacionBD implements DAO {
 			stmt.setFloat(8, j.getBanda_sonora());
 			stmt.setFloat(9, j.getMedia());
 
-			System.out.println("setJuego " + j.toString());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -73,6 +76,8 @@ public class DAOImplementacionBD implements DAO {
 
 	public Juego getJuego(ResultSet rs, Juego j) {
 		try {
+			j.setId(rs.getInt("id"));
+			j.setNombre(rs.getString("nombre"));
 			j.setJugabilidad(rs.getFloat("jugabilidad"));
 			j.setDiseño(rs.getFloat("diseño"));
 			j.setRejugabilidad(rs.getFloat("rejugabilidad"));
@@ -126,6 +131,30 @@ public class DAOImplementacionBD implements DAO {
 		this.cerrarConexion();
 		return juegos;
 	}
+	
+	@Override
+	public List<Juego> mostrarTodosJuegos() {
+		List<Juego> juegos = new ArrayList<>();
+
+		this.abrirConexion();
+
+		try {
+			stmt = con.prepareStatement(LISTAR_JUEGOS);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				Juego j = new Juego();
+				j = getJuego(rs, j);
+				juegos.add(j);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		this.cerrarConexion();
+		return juegos;
+	}
+
 
 	@Override
 	public List<Juego> BuscarJuegos(String busqueda) {
@@ -162,7 +191,6 @@ public class DAOImplementacionBD implements DAO {
 			stmt = setJuego(stmt, j);
 			stmt.setString(10, j.getNombre());
 
-			System.out.println(stmt);
 			stmt.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -179,8 +207,6 @@ public class DAOImplementacionBD implements DAO {
 			stmt = con.prepareStatement(MOSTRAR_JUEGO);
 			stmt.setString(1, nombre);
 
-			System.out.println(stmt);
-
 			ResultSet rs = stmt.executeQuery();
 
 			if (rs.next()) {
@@ -194,4 +220,60 @@ public class DAOImplementacionBD implements DAO {
 		return j;
 	}
 
+	@Override
+	public void eliminarJuego(int id) {
+		this.abrirConexion();
+
+		try {
+			stmt = con.prepareStatement(ELIMINAR_JUEGO);
+			stmt.setInt(1, id);
+			stmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		this.cerrarConexion();
+	}
+
+	@Override
+	public List<Juego> ordenar(String criterio, String condicion, String operador, String orden) {
+		List<Juego> juegos = new ArrayList<>();
+		this.abrirConexion();
+
+		try {
+			if (condicion == "") {
+
+				stmt = con.prepareStatement("SELECT * FROM juegos ORDER BY " + criterio + " " + orden);
+
+				/*
+				 * stmt.setString(1, criterio); stmt.setString(2, orden);
+				 */
+				System.out.println(stmt);
+			} else {
+				stmt = con.prepareStatement("SELECT * FROM juegos WHERE " + criterio + " " + operador + " " + condicion
+						+ " ORDER BY " + criterio + " " + orden);
+
+				/*
+				 * stmt.setString(1, criterio); stmt.setString(2, operador); stmt.setString(3,
+				 * condicion); stmt.setString(4, criterio); stmt.setString(5, orden);
+				 */
+				System.out.println(stmt);
+			}
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				Juego j = new Juego();
+				j = getJuego(rs, j);
+				juegos.add(j);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		this.cerrarConexion();
+		return juegos;
+	}
+
+	
 }

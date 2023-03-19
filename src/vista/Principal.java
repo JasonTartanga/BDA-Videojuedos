@@ -3,19 +3,24 @@ package vista;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import clase.Juego;
 import modelo.DAO;
 
 public class Principal extends JFrame implements ActionListener {
@@ -32,9 +37,11 @@ public class Principal extends JFrame implements ActionListener {
 	private JButton btnEliminar;
 
 	private DAO dao;
+	private JLabel lblNewLabel;
 
 	public Principal(DAO dao) {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/utilidades/base-de-datos.png")));
+		setIconImage(
+				Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/utilidades/base-de-datos.png")));
 		setTitle("Videojuegos\r\n");
 		Dimension tam = Toolkit.getDefaultToolkit().getScreenSize();
 		@SuppressWarnings("unused")
@@ -43,7 +50,7 @@ public class Principal extends JFrame implements ActionListener {
 		int alto = (int) tam.getHeight();
 
 		this.dao = dao;
-		
+
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1920, 1080);
@@ -90,22 +97,53 @@ public class Principal extends JFrame implements ActionListener {
 		separator.setBounds(29, 115, 1865, 28);
 		contentPane.add(separator);
 
-		tabla = new JTable();
+		List<Juego> juegos = dao.mostrarTodosJuegos();
+
+		Object[][] matriz = new Object[juegos.size()][10];
+
+		for (int i = 0; i < juegos.size(); i++) {
+			matriz[i][0] = juegos.get(i).getId();
+			matriz[i][1] = juegos.get(i).getNombre();
+			matriz[i][2] = juegos.get(i).getJugabilidad();
+			matriz[i][3] = juegos.get(i).getDiseño();
+			matriz[i][4] = juegos.get(i).getRejugabilidad();
+			matriz[i][5] = juegos.get(i).getMundo();
+			matriz[i][6] = juegos.get(i).getGraficos();
+			matriz[i][7] = juegos.get(i).getHistoria();
+			matriz[i][8] = juegos.get(i).getHistoria();
+			matriz[i][9] = juegos.get(i).getMedia();
+		}
+		String[] cabezeras = { "Id", "Nombre", "Jugabilidad", "Dise\u00F1o", "Rejugabilidad", "Mundo", "Graficos",
+				"Historia", "Banda Sonora", "Media" };
+
+		tabla = new JTable(matriz, cabezeras);
+		tabla.setFont(new Font("Monospaced", Font.PLAIN, 16));
 		tabla.setBounds(86, 258, 1444, 665);
 		contentPane.add(tabla);
+		Rectangle rect = tabla.getCellRect(tabla.getRowCount() - 1, 0, true);
+		tabla.scrollRectToVisible(rect);
 
 		buscar = new JTextField();
+		buscar.setFont(new Font("Serif", Font.PLAIN, 24));
 		buscar.setBounds(1340, 31, 357, 44);
 		contentPane.add(buscar);
 		buscar.setColumns(10);
 
-		btnBuscar = new JButton("Buscar");
-		btnBuscar.setBackground(SystemColor.controlHighlight);
-		btnBuscar.setFont(new Font("Serif", Font.PLAIN, 20));
-		btnBuscar.setBounds(1745, 31, 149, 44);
+		btnBuscar = new JButton("");
+		btnBuscar.setIcon(new ImageIcon(Principal.class.getResource("/utilidades/buscar.png")));
+		btnBuscar.setBackground(new Color(49, 51, 56));
+		btnBuscar.setFont(new Font("Serif", Font.PLAIN, 24));
+		btnBuscar.setBounds(1742, 17, 97, 73);
 		contentPane.add(btnBuscar);
 		btnBuscar.setRolloverEnabled(false);
+
+		lblNewLabel = new JLabel("Jason\'s BD");
+		lblNewLabel.setForeground(SystemColor.textHighlightText);
+		lblNewLabel.setFont(new Font("Serif", Font.PLAIN, 50));
+		lblNewLabel.setBounds(163, 39, 233, 65);
+		contentPane.add(lblNewLabel);
 		btnBuscar.addActionListener(this);
+
 	}
 
 	@Override
@@ -136,7 +174,7 @@ public class Principal extends JFrame implements ActionListener {
 	}
 
 	private void listar() {
-		Listar list = new Listar(this, dao);
+		Listar list = new Listar(this, dao, tabla);
 		list.setVisible(true);
 	}
 

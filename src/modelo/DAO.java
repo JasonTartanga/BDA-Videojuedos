@@ -14,5 +14,11 @@ public interface DAO {
 	
 	public List<Juego> BuscarJuegos(String busqueda);
 	
+	public List<Juego> mostrarTodosJuegos();
+	
+	public List<Juego> ordenar(String criterio, String condicion, String operador, String orden);
+	
 	public Juego mostrarJuego(String nombre);
+	
+	public void eliminarJuego(int id);
 }
