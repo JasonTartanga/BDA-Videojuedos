@@ -34,10 +34,13 @@ public class DAOImplementacionBD implements DAO {
 	final private String ORDENAR_JUEGOS_CONDICION = "SELECT * FROM juegos WHERE ? ? ? ORDER BY ? ?";
 
 	public void abrirConexion() {
+		final String URL = "jdbc:mysql://localhost:3306/VIDEOJUEGOS?serverTimezone=Europe/Madrid&useSSL=false";
+		final String USER = "root";
+		final String PASSWORD = "abcd*1234";
+
 		try {
-			con = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/VIDEOJUEGOS?serverTimezone=Europe/Madrid&useSSL=false", "root",
-					"abcd*1234");
+			con = DriverManager.getConnection(URL, USER, PASSWORD);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -131,7 +134,7 @@ public class DAOImplementacionBD implements DAO {
 		this.cerrarConexion();
 		return juegos;
 	}
-	
+
 	@Override
 	public List<Juego> mostrarTodosJuegos() {
 		List<Juego> juegos = new ArrayList<>();
@@ -154,7 +157,6 @@ public class DAOImplementacionBD implements DAO {
 		this.cerrarConexion();
 		return juegos;
 	}
-
 
 	@Override
 	public List<Juego> BuscarJuegos(String busqueda) {
@@ -275,5 +277,4 @@ public class DAOImplementacionBD implements DAO {
 		return juegos;
 	}
 
-	
 }

@@ -19,6 +19,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 
 import clase.Juego;
 import modelo.DAO;
@@ -100,7 +101,7 @@ public class Principal extends JFrame implements ActionListener {
 		List<Juego> juegos = dao.mostrarTodosJuegos();
 
 		Object[][] matriz = new Object[juegos.size()][10];
-
+		
 		for (int i = 0; i < juegos.size(); i++) {
 			matriz[i][0] = juegos.get(i).getId();
 			matriz[i][1] = juegos.get(i).getNombre();
@@ -175,7 +176,9 @@ public class Principal extends JFrame implements ActionListener {
 
 	private void listar() {
 		Listar list = new Listar(this, dao, tabla);
+		limpiarTabla();
 		list.setVisible(true);
+
 	}
 
 	private void modificar() {
@@ -186,6 +189,10 @@ public class Principal extends JFrame implements ActionListener {
 	private void añadir() {
 		Añadir add = new Añadir(this, dao);
 		add.setVisible(true);
+	}
+
+	public void limpiarTabla() {
+
 	}
 
 }

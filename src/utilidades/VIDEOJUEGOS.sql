@@ -4,8 +4,8 @@ USE VIDEOJUEGOS;
 
 DROP TABLE IF EXISTS JUEGOS;
 CREATE TABLE JUEGOS(
-	cod				int				primary key		auto_increment,
-    juegos			varchar(200)	not null		unique,
+	id				int				primary key		auto_increment,
+    nombre			varchar(200)	not null		unique,
     jugabilidad		double,
     diseño			double,
     rejugabilidad	double,
