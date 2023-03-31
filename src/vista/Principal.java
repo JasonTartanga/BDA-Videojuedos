@@ -8,6 +8,9 @@ import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -15,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -39,6 +43,7 @@ public class Principal extends JFrame implements ActionListener {
 
 	private DAO dao;
 	private JLabel lblNewLabel;
+	private List<Juego> juegos;
 
 	public Principal(DAO dao) {
 		setIconImage(
@@ -98,32 +103,19 @@ public class Principal extends JFrame implements ActionListener {
 		separator.setBounds(29, 115, 1865, 28);
 		contentPane.add(separator);
 
-		List<Juego> juegos = dao.mostrarTodosJuegos();
+		juegos = dao.mostrarTodosJuegos();
 
-		Object[][] matriz = new Object[juegos.size()][10];
-		
-		for (int i = 0; i < juegos.size(); i++) {
-			matriz[i][0] = juegos.get(i).getId();
-			matriz[i][1] = juegos.get(i).getNombre();
-			matriz[i][2] = juegos.get(i).getJugabilidad();
-			matriz[i][3] = juegos.get(i).getDiseño();
-			matriz[i][4] = juegos.get(i).getRejugabilidad();
-			matriz[i][5] = juegos.get(i).getMundo();
-			matriz[i][6] = juegos.get(i).getGraficos();
-			matriz[i][7] = juegos.get(i).getHistoria();
-			matriz[i][8] = juegos.get(i).getHistoria();
-			matriz[i][9] = juegos.get(i).getMedia();
-		}
-		String[] cabezeras = { "Id", "Nombre", "Jugabilidad", "Dise\u00F1o", "Rejugabilidad", "Mundo", "Graficos",
-				"Historia", "Banda Sonora", "Media" };
-
-		tabla = new JTable(matriz, cabezeras);
-		tabla.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		tabla.setBounds(86, 258, 1444, 665);
-		contentPane.add(tabla);
-		Rectangle rect = tabla.getCellRect(tabla.getRowCount() - 1, 0, true);
-		tabla.scrollRectToVisible(rect);
-
+		this.presentarTabla(juegos);
+		/*
+		 * Object[][] matriz = new Object[juegos.size()][10];
+		 * 
+		 * for (int i = 0; i < juegos.size(); i++) {
+		 * 
+		 * } String[] cabezeras = { "Id", "Nombre", "Jugabilidad", "Dise\u00F1o",
+		 * "Rejugabilidad", "Mundo", "Graficos", "Historia", "Banda Sonora", "Media" };
+		 * 
+		 * this.crearTabla(matriz, cabezeras);
+		 */
 		buscar = new JTextField();
 		buscar.setFont(new Font("Serif", Font.PLAIN, 24));
 		buscar.setBounds(1340, 31, 357, 44);
@@ -176,7 +168,6 @@ public class Principal extends JFrame implements ActionListener {
 
 	private void listar() {
 		Listar list = new Listar(this, dao, tabla);
-		limpiarTabla();
 		list.setVisible(true);
 
 	}
@@ -191,8 +182,37 @@ public class Principal extends JFrame implements ActionListener {
 		add.setVisible(true);
 	}
 
-	public void limpiarTabla() {
+	public void presentarTabla(List<Juego> juegos) {
+		JScrollPane scroll = new JScrollPane();
+		tabla = this.cargarTabla(juegos);
+		scroll.setViewportView(tabla);
+		contentPane.add(scroll);
+		scroll.setBounds(86, 258, 1444, 665);
+	}
 
+	public JTable cargarTabla(List<Juego> juegos) {
+		String[] cabezeras = { "Id", "Nombre", "Jugabilidad", "Dise\u00F1o", "Rejugabilidad", "Mundo", "Graficos",
+				"Historia", "Banda Sonora", "Media" };
+		String[] fila = new String[10];
+
+		DefaultTableModel model = new DefaultTableModel(null, cabezeras);
+
+		for (Juego j : juegos) {
+			fila[0] = j.getId() + "";
+			fila[1] = j.getNombre();
+			fila[2] = j.getJugabilidad() + "";
+			fila[3] = j.getDiseño() + "";
+			fila[4] = j.getRejugabilidad() + "";
+			fila[5] = j.getMundo() + "";
+			fila[6] = j.getGraficos() + "";
+			fila[7] = j.getHistoria() + "";
+			fila[8] = j.getHistoria() + "";
+			fila[9] = j.getMedia() + "";
+
+			model.addRow(fila);
+		}
+
+		return new JTable(model);
 	}
 
 }

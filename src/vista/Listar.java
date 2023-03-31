@@ -37,9 +37,9 @@ public class Listar extends JDialog implements ActionListener {
 	private ButtonGroup grupo;
 	private JButton btnOrdenar;
 
-	private List<Juego> juegos;
 	private DAO dao;
 	private JTable tabla;
+	private Principal main;
 
 	public Listar(Principal main, DAO dao, JTable tabla) {
 		super(main);
@@ -48,6 +48,7 @@ public class Listar extends JDialog implements ActionListener {
 
 		this.dao = dao;
 		this.tabla = tabla;
+		this.main = main;
 
 		getContentPane().setBackground(new Color(49, 51, 56));
 		setBounds(100, 100, 800, 600);
@@ -153,73 +154,54 @@ public class Listar extends JDialog implements ActionListener {
 	}
 
 	private void ordenar() {
+		String criterioS = null;
+
 		try {
-			String criterioS = criterio.getSelectedItem().toString();
-			String condicionS;
-			
-			if (condicion.getSelectedIndex() == -1) {
-				condicionS = "";
-			} else {
-				condicionS = condicion.getSelectedItem().toString();
-			}
-			
-			String ordenS = orden.getSelectedItem().toString();
-			String operador;
-
-			if (criterioS.equalsIgnoreCase("Banda Sonora")) {
-				criterioS = "banda_sonora";
-			}
-			// Cambiamos la variable operador para que coincida con SQL
-			if (rdbtnMas.isSelected()) {
-				operador = ">";
-			} else {
-				operador = "<";
-			}
-
-			// Cambiamos la variable de orden para que coincida con SQL
-			if (ordenS.equalsIgnoreCase("De mayor a menor")) {
-				ordenS = "desc";
-			} else {
-				ordenS = "asc";
-			}
-
-			juegos = dao.ordenar(criterioS, condicionS, operador, ordenS);
-
-			
-			
-			DefaultTableModel modelo = new DefaultTableModel();
-			
-			tabla.setModel(modelo);
-			
-			Object[][] matriz = new Object[juegos.size()][10];
-
-			for (int i = 0; i < juegos.size(); i++) {
-				matriz[i][0] = juegos.get(i).getId();
-				matriz[i][1] = juegos.get(i).getNombre();
-				matriz[i][2] = juegos.get(i).getJugabilidad();
-				matriz[i][3] = juegos.get(i).getDiseño();
-				matriz[i][4] = juegos.get(i).getRejugabilidad();
-				matriz[i][5] = juegos.get(i).getMundo();
-				matriz[i][6] = juegos.get(i).getGraficos();
-				matriz[i][7] = juegos.get(i).getHistoria();
-				matriz[i][8] = juegos.get(i).getHistoria();
-				matriz[i][9] = juegos.get(i).getMedia();
-				
-				modelo.addRow(matriz);
-				
-				System.out.println(juegos.get(i).toString());
-			}
-
-			for (int i = 0; i < matriz.length; i++) {
-				tabla.setValueAt(matriz, i, i);
-			}
-			
-			tabla.repaint();
-
-			this.dispose();
+			criterioS = criterio.getSelectedItem().toString();
 		} catch (NullPointerException e) {
 			JOptionPane.showMessageDialog(this, "Debes escojer almenos un criterio", "ERROR", 0);
 		}
+
+		String condicionS;
+
+		if (condicion.getSelectedIndex() == -1) {
+			condicionS = "";
+		} else {
+			condicionS = condicion.getSelectedItem().toString();
+		}
+
+		String ordenS = orden.getSelectedItem().toString();
+		String operador;
+
+		if (criterioS.equalsIgnoreCase("Banda Sonora")) {
+			criterioS = "banda_sonora";
+		}
+		// Cambiamos la variable operador para que coincida con SQL
+		if (rdbtnMas.isSelected()) {
+			operador = ">";
+		} else {
+			operador = "<";
+		}
+
+		// Cambiamos la variable de orden para que coincida con SQL
+		System.out.println(ordenS);
+		if (ordenS.equalsIgnoreCase("Mayor a menor")) {
+			ordenS = "desc";
+		} else {
+			ordenS = "asc";
+		}
+ 
+		List<Juego> juegos = dao.ordenar(criterioS, condicionS, operador, ordenS);
+
+		for (Juego juego : juegos) {
+			System.out.println(juego.toString());
+		}
+	
+		main.presentarTabla(juegos);
+
+		tabla.repaint();
+
+		this.dispose();
 
 	}
 
